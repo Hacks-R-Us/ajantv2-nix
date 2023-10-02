@@ -1,0 +1,13 @@
+diff --git a/gst-plugin/aja/gstntv2.h b/gst-plugin/aja/gstntv2.h
+index 53906e9..0e287df 100644
+--- a/aja/gstntv2.h
++++ b/aja/gstntv2.h
+@@ -23,8 +23,6 @@
+ #include "ajabase/common/timebase.h"
+ #include "ajabase/system/thread.h"
+ 
+-#include "ntv2m31.h"
+-
+ #define VIDEO_RING_SIZE            16
+ #define VIDEO_ARRAY_SIZE        60
+ #define AUDIO_RING_SIZE            (3*VIDEO_RING_SIZE)

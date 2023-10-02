@@ -1,0 +1,20 @@
+diff --git a/ajadriver/linux/Makefile b/ajadriver/linux/Makefile
+index 710951b..6fde2b4 100644
+--- a/ajadriver/linux/Makefile
++++ b/ajadriver/linux/Makefile
+@@ -177,15 +177,6 @@ all: $(DRIVERINCS) $(DRIVERSRCS) $(HEVCINCS) $(HEVCSRCS) $(RDMAINCS)
+ 
+ # Make a symlink to the C-only CPP files we need in classes.
+ 
+-ntv2devicefeatures.c:
+-	ln -sf $(A_LIB_NTV2_SRC)/ntv2devicefeatures.cpp $(A_LINUX_DRIVER_PATH)/ntv2devicefeatures.c
+-
+-ntv2driverprocamp.c: 
+-	ln -sf $(A_LIB_NTV2_SRC)/ntv2driverprocamp.cpp $(A_LINUX_DRIVER_PATH)/ntv2driverprocamp.c
+-
+-ntv2vpidfromspec.c: 
+-	ln -sf $(A_LIB_NTV2_SRC)/ntv2vpidfromspec.cpp $(A_LINUX_DRIVER_PATH)/ntv2vpidfromspec.c
+-
+ .PHONY: clean cleandeps realclean
+ 
+ clean:

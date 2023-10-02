@@ -1,0 +1,151 @@
+Fixes for newer kernels
+Includes:
+https://github.com/nvidia-holoscan/ntv2/commit/70f44cea11560316714ab382bf6799d09ae51b74
+
+diff --git a/ajadriver/linux/ntv2dma.c b/ajadriver/linux/ntv2dma.c
+index 8d0aa23..83a73b4 100644
+--- a/ajadriver/linux/ntv2dma.c
++++ b/ajadriver/linux/ntv2dma.c
+@@ -473,9 +473,10 @@ int dmaInit(ULWord deviceNumber)
+ 			for (iDes = 0; iDes < pDmaEngine->numDescriptorPages; iDes++)
+ 			{
+ 				pDmaEngine->pDescriptorVirtual[iDes] =
+-					pci_alloc_consistent(pNTV2Params->pci_dev,
++					dma_alloc_coherent(&pNTV2Params->pci_dev->dev,
+ 										 PAGE_SIZE,
+-										 &pDmaEngine->descriptorPhysical[iDes]);
++										 &pDmaEngine->descriptorPhysical[iDes],
++										 GFP_ATOMIC);
+ 				if ((pDmaEngine->pDescriptorVirtual[iDes] == NULL) ||
+ 					(pDmaEngine->descriptorPhysical[iDes] == 0))
+ 				{
+@@ -556,7 +557,7 @@ static void dmaFreeEngine(PDMA_ENGINE pDmaEngine)
+ 		if ((pDmaEngine->pDescriptorVirtual[iDes] != NULL) &&
+ 			(pDmaEngine->descriptorPhysical[iDes] != 0))
+ 		{
+-			pci_free_consistent(pNTV2Params->pci_dev,
++			dma_free_coherent(&pNTV2Params->pci_dev->dev,
+ 								PAGE_SIZE,
+ 								pDmaEngine->pDescriptorVirtual[iDes],
+ 								pDmaEngine->descriptorPhysical[iDes]);
+@@ -914,7 +915,7 @@ int dmaTransfer(PDMA_PARAMS pDmaParams)
+ 			pDmaContext->dmaC2H = pDmaParams->toHost;
+ 		}
+ 		dmaC2H = pDmaContext->dmaC2H;
+-		direction = dmaC2H? PCI_DMA_FROMDEVICE : PCI_DMA_TODEVICE;
++		direction = dmaC2H? DMA_FROM_DEVICE : DMA_TO_DEVICE;
+ 
+ 		// do nothing by default
+ 		pDmaContext->pVideoPageBuffer = NULL;
+@@ -2282,7 +2283,7 @@ int dmaPageRootAdd(ULWord deviceNumber, PDMA_PAGE_ROOT pRoot,
+ 	}
+ 	
+ 	// lock buffer 
+-	ret = dmaPageLock(deviceNumber, pBuffer, pAddress, size, PCI_DMA_BIDIRECTIONAL);
++	ret = dmaPageLock(deviceNumber, pBuffer, pAddress, size, DMA_BIDIRECTIONAL);
+ 	if (ret < 0)
+ 	{
+ 		kfree(pBuffer);
+@@ -2655,7 +2656,7 @@ static int dmaPageLock(ULWord deviceNumber, PDMA_PAGE_BUFFER pBuffer,
+ 	}
+ 
+ 	// determine if buffer will be written
+-	write = (direction == PCI_DMA_BIDIRECTIONAL) || (direction == PCI_DMA_FROMDEVICE);
++	write = (direction == DMA_BIDIRECTIONAL) || (direction == DMA_FROM_DEVICE);
+ 
+ 	// get the map semaphore
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,8,0))
+@@ -2785,7 +2786,7 @@ static void dmaPageUnlock(ULWord deviceNumber, PDMA_PAGE_BUFFER pBuffer)
+ 		// release the locked pages
+ 		for (i = 0; i < pBuffer->numPages; i++)
+ 		{
+-			if ((pBuffer->direction == PCI_DMA_FROMDEVICE) &&
++			if ((pBuffer->direction == DMA_FROM_DEVICE) &&
+ 				!PageReserved(pBuffer->pPageList[i]))
+ 			{
+ 				set_page_dirty(pBuffer->pPageList[i]);
+@@ -2907,7 +2908,7 @@ static int dmaSgMap(ULWord deviceNumber, PDMA_PAGE_BUFFER pBuffer)
+ 			ret = nvidia_p2p_dma_map_pages(&(pNTV2Params->pci_dev)->dev,
+ 										   pBuffer->rdmaPage,
+ 										   &pBuffer->rdmaMap,
+-										   (pBuffer->direction == PCI_DMA_TODEVICE)? DMA_TO_DEVICE : DMA_FROM_DEVICE);
++										   (pBuffer->direction == DMA_TO_DEVICE)? DMA_TO_DEVICE : DMA_FROM_DEVICE);
+ #else
+ 			ret = nvidia_p2p_dma_map_pages(pNTV2Params->pci_dev,
+ 										   pBuffer->rdmaPage,
+diff --git a/ajadriver/linux/ntv2driver.c b/ajadriver/linux/ntv2driver.c
+index d97e242..a1569aa 100644
+--- a/ajadriver/linux/ntv2driver.c
++++ b/ajadriver/linux/ntv2driver.c
+@@ -4398,9 +4398,9 @@ pci_resources_config (struct pci_dev *pdev, NTV2PrivateParams * ntv2pp)
+ 	// a 64-bit mask from a previous driver load.
+ 
+ #if defined(DMA_BIT_MASK)
+-	if((res = pci_set_dma_mask(pdev, DMA_BIT_MASK(32))) != 0)
++	if((res = dma_set_mask(&pdev->dev, DMA_BIT_MASK(32))) != 0)
+ #else
+-	if((res = pci_set_dma_mask(pdev, DMA_32BIT_MASK)) != 0)
++	if((res = dma_set_mask(&pdev->dev, DMA_32BIT_MASK)) != 0)
+ #endif
+ 	{
+ 	   MSG("%s: Unable to set DMA mask.  Disabling this board.\n",
+@@ -4704,9 +4704,9 @@ dma_registers_init (struct pci_dev *pdev, NTV2PrivateParams * ntv2pp)
+ 	}
+ 
+ #if defined(DMA_BIT_MASK)
+-	if(!pci_set_dma_mask(pdev, DMA_BIT_MASK(64)))
++	if(!dma_set_mask(&pdev->dev, DMA_BIT_MASK(64)))
+ #else
+-	if(!pci_set_dma_mask(pdev, DMA_64BIT_MASK))
++	if(!dma_set_mask(&pdev->dev, DMA_64BIT_MASK))
+ #endif
+ 	{
+ 		MSG("%s: Using 64-bit DMA mask with 64-bit capable firmware\n",
+diff --git a/ajadriver/ntv2system.c b/ajadriver/ntv2system.c
+index 0859239..0c723fc 100644
+--- a/ajadriver/ntv2system.c
++++ b/ajadriver/ntv2system.c
+@@ -1513,7 +1513,7 @@ bool ntv2DmaMemoryAlloc(Ntv2DmaMemory* pDmaMemory, Ntv2SystemContext* pSysCon, u
+ 	   (pSysCon->pDevice == NULL) ||
+ 	   (size == 0)) return false;
+ 
+-	pAddress = pci_alloc_consistent(pSysCon->pDevice, size, &dmaAddress);
++	pAddress = dma_alloc_coherent(&pSysCon->pDevice->dev, size, &dmaAddress, GFP_ATOMIC);
+ 	if((pAddress == NULL) || (dmaAddress == 0)) return false;
+ 
+ 	// initialize memory data structure
+@@ -1534,7 +1534,7 @@ void ntv2DmaMemoryFree(Ntv2DmaMemory* pDmaMemory)
+ 	   (pDmaMemory->dmaAddress == 0) ||
+ 	   (pDmaMemory->size == 0)) return;
+ 
+-	pci_free_consistent(pDmaMemory->pDevice,
++	dma_free_coherent(&pDmaMemory->pDevice->dev,
+ 						pDmaMemory->size,
+ 						pDmaMemory->pAddress,
+ 						pDmaMemory->dmaAddress);
+diff --git a/ajalibraries/ajantv2/includes/ntv2devicefeatures.h b/ajalibraries/ajantv2/includes/ntv2devicefeatures.h
+index 4dc2bd5..cd1972e 100644
+--- a/ajalibraries/ajantv2/includes/ntv2devicefeatures.h
++++ b/ajalibraries/ajantv2/includes/ntv2devicefeatures.h
+@@ -10,7 +10,7 @@
+ #define NTV2DEVICEFEATURES_H
+ 
+ #if defined(AJALinux) || defined(AJA_LINUX)
+-	#include <stddef.h>		// For size_t
++	#include <linux/stddef.h>		// For size_t
+ #endif
+ 
+ #include "ajaexport.h"
+diff --git a/ajadriver/linux/ntv2serial.c b/ajadriver/linux/ntv2serial.c
+index 3ba5ea6..8d9e483 100644
+--- a/ajadriver/linux/ntv2serial.c
++++ b/ajadriver/linux/ntv2serial.c
+@@ -170,7 +170,7 @@ static void ntv2_uartops_shutdown(struct uart_port *port)
+ 
+ static void ntv2_uartops_set_termios(struct uart_port *port,
+ 									 struct ktermios *termios,
+-									 struct ktermios *old)
++									 const struct ktermios *old)
+ {
+ 	struct ntv2_serial *ntv2_ser = container_of(port, struct ntv2_serial, uart_port);
+ 	u32 valid = ntv2_kona_fld_serial_rx_valid;
