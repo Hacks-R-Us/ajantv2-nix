@@ -17,10 +17,10 @@
       formatter = pkgs.alejandra;
     })
     ) // {
-      overlays.default = (final: prev: {
+      overlays.default = final: prev: {
         ajantv-utils = final.callPackage ./aja-ntv2/default.nix {};
         ajantv-driver = final.linuxPackages.callPackage ./aja-ntv2/driver.nix {};
         aja-ntv2-gst = self.packages.${prev.system}.aja-ntv2-gst;
-      });
+      };
     };
 }
