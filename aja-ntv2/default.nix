@@ -1,14 +1,14 @@
 {
   stdenv,
-  callPackage,
   lib,
   cmake,
+  aja-src,
   buildApps ? true,
 }:
 stdenv.mkDerivation {
   name = "ajantv2-dev";
-  src = callPackage ./src.nix {};
-  nativeBuildInputs = [ cmake ];
+  src = aja-src;
+  nativeBuildInputs = [cmake];
 
   cmakeFlags =
     [
