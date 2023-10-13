@@ -1,4 +1,6 @@
-{ pkgs }: pkgs.fetchFromGitHub {
+{ fetchFromGitHub }:
+
+fetchFromGitHub {
   owner = "aja-video";
   repo = "ntv2";
   rev = "refs/heads/main";
