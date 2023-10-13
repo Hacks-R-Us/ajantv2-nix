@@ -1,13 +1,12 @@
 {
   description = "AJA video card software";
-  inputs.utils.url = "github:numtide/flake-utils";
 
   outputs = {
     self,
     nixpkgs,
-    utils,
+    flake-utils,
   }: (
-    utils.lib.eachSystem ["x86_64-linux"] (system: let
+    flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
       pkgs = import nixpkgs {
         inherit system;
       };
@@ -18,10 +17,10 @@
       formatter = pkgs.alejandra;
     })
     ) // {
-      overlays.default = (final: prev: {
+      overlays.default = final: prev: {
         ajantv-utils = final.callPackage ./aja-ntv2/default.nix {};
         ajantv-driver = final.linuxPackages.callPackage ./aja-ntv2/driver.nix {};
         aja-ntv2-gst = self.packages.${prev.system}.aja-ntv2-gst;
-      });
+      };
     };
 }

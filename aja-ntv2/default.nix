@@ -2,13 +2,13 @@
   stdenv,
   callPackage,
   lib,
-  pkgs,
+  cmake,
   buildApps ? true,
 }:
 stdenv.mkDerivation {
   name = "ajantv2-dev";
   src = callPackage ./src.nix {};
-  nativeBuildInputs = [pkgs.cmake];
+  nativeBuildInputs = [ cmake ];
 
   cmakeFlags =
     [

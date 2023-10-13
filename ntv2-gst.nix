@@ -1,7 +1,11 @@
 {
   stdenv,
-  pkgs,
   fetchFromGitHub,
+  autoconf,
+  automake,
+  pkgconfig,
+  libtool,
+  gst_all_1,
   ajantv2,
 }:
 stdenv.mkDerivation {
@@ -15,7 +19,7 @@ stdenv.mkDerivation {
   sourceRoot = "source/gst-plugin";
   patches = [./no.patch];
 
-  nativeBuildInputs = with pkgs; [autoconf automake pkgconfig libtool gst_all_1.gst-plugins-base ajantv2];
+  nativeBuildInputs = [autoconf automake pkgconfig libtool gst_all_1.gst-plugins-base ajantv2];
   GST_NTV2 = "${ajantv2}/include";
   preConfigure = ''
     ./autogen.sh
