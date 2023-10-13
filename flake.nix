@@ -1,13 +1,12 @@
 {
   description = "AJA video card software";
-  inputs.utils.url = "github:numtide/flake-utils";
 
   outputs = {
     self,
     nixpkgs,
-    utils,
+    flake-utils,
   }: (
-    utils.lib.eachSystem ["x86_64-linux"] (system: let
+    flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
       pkgs = import nixpkgs {
         inherit system;
       };
