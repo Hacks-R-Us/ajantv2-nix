@@ -1,9 +1,16 @@
 {
   description = "AJA video card software";
+
   inputs.ntv2-src = {
     type = "github";
     owner = "aja-video";
     repo = "ntv2";
+    flake = false;
+  };
+  inputs.ntv2-gst-src = {
+    type = "github";
+    owner = "aja-video";
+    repo = "ntv2-gst";
     flake = false;
   };
 
@@ -12,6 +19,7 @@
     nixpkgs,
     flake-utils,
     ntv2-src,
+    ntv2-gst-src,
   }:
     (
       flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
@@ -24,6 +32,7 @@
             inherit ntv2-src;
             buildApps = false;
           };
+          inherit ntv2-gst-src;
         };
       })
     )

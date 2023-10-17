@@ -1,6 +1,6 @@
 {
   stdenv,
-  fetchFromGitHub,
+  ntv2-gst-src,
   autoconf,
   automake,
   pkgconfig,
@@ -10,12 +10,7 @@
 }:
 stdenv.mkDerivation {
   name = "aja-ntv2-gst";
-  src = fetchFromGitHub {
-    owner = "aja-video";
-    repo = "ntv2-gst";
-    rev = "refs/heads/master";
-    hash = "sha256-90TdrsnO5LatLD4dwivOnZG4tGJmNs2tdAsrL7eQF8g=";
-  };
+  src = ntv2-gst-src;
   sourceRoot = "source/gst-plugin";
   patches = [./no.patch];
 

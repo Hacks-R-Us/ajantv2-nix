@@ -30,6 +30,22 @@
         "type": "indirect"
       }
     },
+    "ntv2-gst-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1692893804,
+        "narHash": "sha256-90TdrsnO5LatLD4dwivOnZG4tGJmNs2tdAsrL7eQF8g=",
+        "owner": "aja-video",
+        "repo": "ntv2-gst",
+        "rev": "33d3a4957088e49ccecd9efa577b87bb0492f738",
+        "type": "github"
+      },
+      "original": {
+        "owner": "aja-video",
+        "repo": "ntv2-gst",
+        "type": "github"
+      }
+    },
     "ntv2-src": {
       "flake": false,
       "locked": {
@@ -50,6 +66,7 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
+        "ntv2-gst-src": "ntv2-gst-src",
         "ntv2-src": "ntv2-src"
       }
     },
