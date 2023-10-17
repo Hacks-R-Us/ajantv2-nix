@@ -1,7 +1,9 @@
 {
   description = "AJA video card software";
   inputs.aja-ntv2 = {
-    url = "github:aja-video/ntv2";
+    type = "github";
+    owner = "aja-video";
+    repo = "ntv2";
     flake = false;
   };
 
