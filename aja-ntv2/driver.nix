@@ -2,11 +2,11 @@
   stdenv,
   nukeReferences,
   kernel,
-  aja-src,
+  ntv2-src,
 }:
 stdenv.mkDerivation {
   name = "ajantv2-driver-${kernel.version}";
-  src = aja-src;
+  src = ntv2-src;
   patches = [./lol.patch ./newkernels.patch];
   nativeBuildInputs = kernel.moduleBuildDependencies;
   buildInputs = [nukeReferences];

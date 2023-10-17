@@ -2,12 +2,12 @@
   stdenv,
   lib,
   cmake,
-  aja-src,
+  ntv2-src,
   buildApps ? true,
 }:
 stdenv.mkDerivation {
   name = "ajantv2-dev";
-  src = aja-src;
+  src = ntv2-src;
   nativeBuildInputs = [cmake];
 
   cmakeFlags =
