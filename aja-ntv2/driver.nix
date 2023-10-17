@@ -5,7 +5,7 @@
   ntv2-src,
 }:
 stdenv.mkDerivation {
-  name = "ajantv2-driver-${kernel.version}";
+  name = "ntv2-driver-${kernel.version}";
   src = ntv2-src;
   patches = [./lol.patch ./newkernels.patch];
   nativeBuildInputs = kernel.moduleBuildDependencies;

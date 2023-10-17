@@ -6,7 +6,7 @@
   buildApps ? true,
 }:
 stdenv.mkDerivation {
-  name = "ajantv2-dev";
+  name = "ntv2";
   src = ntv2-src;
   nativeBuildInputs = [cmake];
 

@@ -21,33 +21,23 @@
     ntv2-src,
     ntv2-gst-src,
   }:
-    (
-      flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
-        pkgs = import nixpkgs {
-          inherit system;
-        };
-      in {
-        packages.aja-ntv2-gst = pkgs.callPackage ./ntv2-gst.nix {
-          ajantv2 = pkgs.callPackage ./aja-ntv2/default.nix {
-            inherit ntv2-src;
-            buildApps = false;
-          };
-          inherit ntv2-gst-src;
-        };
-      })
-    )
-    // flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs {
-        inherit system;
-      };
-    in {
-      formatter = pkgs.alejandra;
-    })
-    // {
-      overlays.default = final: prev: {
-        ajantv-utils = final.callPackage ./aja-ntv2/default.nix { inherit ntv2-src; };
-        ajantv-driver = final.linuxPackages.callPackage ./aja-ntv2/driver.nix { inherit ntv2-src; };
-        aja-ntv2-gst = self.packages.${prev.system}.aja-ntv2-gst;
-      };
+  {
+    overlays.default = final: prev: {
+      ntv2 = final.callPackage ./aja-ntv2 { inherit ntv2-src; };
+      ntv2-gst = final.callPackage ./ntv2-gst.nix { inherit ntv2-gst-src; };
+      linuxPackages = prev.linuxPackages.extend
+      (linuxFinal: linuxPrev: {
+        ntv2-driver = linuxFinal.callPackage ./aja-ntv2/driver.nix { inherit ntv2-src; };
+      });
     };
+  } // flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
+  let
+    pkgs = import nixpkgs { inherit system; overlays = [ self.overlays.default ]; };
+  in {
+    packages = {
+      inherit (pkgs) ntv2 ntv2-gst;
+      inherit (pkgs.linuxPackages) ntv2-driver;
+    };
+    formatter = pkgs.alejandra;
+  });
 }
