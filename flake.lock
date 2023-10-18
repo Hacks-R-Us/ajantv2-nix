@@ -1,21 +1,5 @@
 {
   "nodes": {
-    "aja-ntv2": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1662565853,
-        "narHash": "sha256-rXjKDhQcZwAxsMjCoL21gpWeLWyIXyK/1y+78mhKgeo=",
-        "owner": "aja-video",
-        "repo": "ntv2",
-        "rev": "3a1e91f740e36e43a1ec74ff446a097330e87220",
-        "type": "github"
-      },
-      "original": {
-        "owner": "aja-video",
-        "repo": "ntv2",
-        "type": "github"
-      }
-    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -46,11 +30,44 @@
         "type": "indirect"
       }
     },
+    "ntv2-gst-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1692893804,
+        "narHash": "sha256-90TdrsnO5LatLD4dwivOnZG4tGJmNs2tdAsrL7eQF8g=",
+        "owner": "aja-video",
+        "repo": "ntv2-gst",
+        "rev": "33d3a4957088e49ccecd9efa577b87bb0492f738",
+        "type": "github"
+      },
+      "original": {
+        "owner": "aja-video",
+        "repo": "ntv2-gst",
+        "type": "github"
+      }
+    },
+    "ntv2-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1662565853,
+        "narHash": "sha256-rXjKDhQcZwAxsMjCoL21gpWeLWyIXyK/1y+78mhKgeo=",
+        "owner": "aja-video",
+        "repo": "ntv2",
+        "rev": "3a1e91f740e36e43a1ec74ff446a097330e87220",
+        "type": "github"
+      },
+      "original": {
+        "owner": "aja-video",
+        "repo": "ntv2",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
-        "aja-ntv2": "aja-ntv2",
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "ntv2-gst-src": "ntv2-gst-src",
+        "ntv2-src": "ntv2-src"
       }
     },
     "systems": {
