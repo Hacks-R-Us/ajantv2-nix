@@ -7,20 +7,9 @@ gstreamer plugin. This allows you to use Aja video IO cards on NixOS.
 ## Usage
 
 - Add the flake to your system flake's inputs.
-- Apply the overlay to your system's nixpkgs, e.g.
+- Enable the module by adding the following to your system config:
   ```nix
-  nixpkgs.overlays = [ ajantv2.overlays.default ];
-  ```
-- Add the kernel driver:
-  ```nix
-  # Include the kernel module 
-  boot.extraModulePackages = [pkgs.linuxPackages.ntv2-driver];
-  # And load it automatically
-  boot.kernelModules = [ "ajantv2" ];
-  ```
-- Include the utils/demos and gstreamer plugin:
-  ```nix
-  environment.systemPackages = [pkgs.ntv2 pkgs.ntv2-gst]
+  ntv2.enable = true;
   ```
 
 ## Gstreamer
